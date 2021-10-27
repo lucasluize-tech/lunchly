@@ -39,13 +39,21 @@ router.post("/add/", async function(req, res, next) {
 
     const customer = new Customer({ firstName, lastName, phone, notes });
     await customer.save();
-
+    
     return res.redirect(`/${customer.id}/`);
   } catch (err) {
     return next(err);
   }
 });
 
+router.get("/loyal", async (req, res, next)=>{
+  try{
+    const customers = await Customer.getBestCustomers()
+    return res.render("customer_list.html", { customers })
+  }catch(e){
+    next(e)
+  }
+})
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function(req, res, next) {
@@ -131,5 +139,19 @@ router.post('/:id/reservations/:res_id', async function(req, res, next){
     next(e)
   }
 })
+
+// search for customer
+
+router.post("/search", async (req, res, next)=>{
+  try{
+    const searchName = req.body.searchName
+    const customers = await Customer.getByName(searchName);
+    return res.render("customer_list.html", { customers })    
+  
+  }catch(e){
+    next(e)
+  }
+})
+
 
 module.exports = router;
